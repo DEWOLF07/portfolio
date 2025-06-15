@@ -18,4 +18,5 @@ I'm a high school student who loves building things with code. I've been program
 - Build a strong portfolio and work with great teams
 
 📫 Reach out: qwadrascii@gmail.com
-🌍 GitHub: Dewolf
+🌍 GitHub: Dewolf07
+
