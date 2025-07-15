@@ -7,22 +7,22 @@ I'm a high school student who loves building things with code. I've been program
 - **Python** – Scripts, tools, simulations (Black-Scholes, Monte Carlo, cryptogram)
 - **C++** – Logic-heavy programming and math-based models
 
-### 🔧 Projects I've Worked On
+### 🔧 Projects
 
-- `priority-queue-csharp`  
-  Custom priority queue using linked nodes in C# with no arrays or lists.
+- [1-priority-queue-csharp](./1priority-queue-csharp)  
+  Custom priority queue using linked nodes in C# (no arrays or lists)
 
-- `black-scholes-cpp`  
-  Simple C++ program to price European options using the Black-Scholes formula.
+- [2-portfolio-simulator](./2portfolio-simulator)  
+  Python simulator for option portfolio P/L
 
-- `monte-carlo-options`  
-  Monte Carlo simulation in C++ estimating European call option prices.
+- [3-stock-comparison-tool](./3stock-comparison-tool)  
+  Python script comparing volatility, returns, and prices of two stocks
 
-- `stock-comparison-tool`  
-  Python script that compares two stocks’ volatility, average returns, and plots their price.
+- [4-black-scholes-cpp](./4black-scholes-cpp)  
+  C++ Black-Scholes option pricer using user input
 
-- `portfolio-simulator`  
-  Python program simulating option portfolio profit/loss across stock prices.
+- [5-monte-carlo-options](./5monte-carlo-options)  
+  C++ Monte Carlo simulation for European call options
 
 ### 🎯 Goals
 - Keep improving in cybersecurity, automation, and math-heavy programming  
