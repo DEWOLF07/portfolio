@@ -1,0 +1,34 @@
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+int main() {
+    double S, K, T, r, sigma;
+    char type;
+
+    cout << "S K T r sigma (e.g. 100 100 1 0.05 0.2): ";
+    cin >> S >> K >> T >> r >> sigma;
+    cout << "Option type (C = Call, P = Put): ";
+    cin >> type;
+
+    double d1 = (log(S / K) + (r + 0.5 * sigma * sigma) * T) / (sigma * sqrt(T));
+    double d2 = d1 - sigma * sqrt(T);
+
+    double Nd1 = 0.5 * (1.0 + erf(d1 / sqrt(2.0)));
+    double Nd2 = 0.5 * (1.0 + erf(d2 / sqrt(2.0)));
+    double Nnd1 = 1.0 - Nd1;
+    double Nnd2 = 1.0 - Nd2;
+
+    double price;
+
+    if (type == 'C' || type == 'c') {
+        price = S * Nd1 - K * exp(-r * T) * Nd2;
+    }
+    else {
+        price = K * exp(-r * T) * Nnd2 - S * Nnd1;
+    }
+
+    cout << "Option price: " << price << endl;
+
+    return 0;
+}
