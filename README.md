@@ -24,6 +24,10 @@ I'm a high school student who loves building things with code. I've been program
 - [5-monte-carlo-options](./5monte-carlo-options)  
   C++ Monte Carlo simulation for European call options
 
+- [6-password-strength-checker](./checkpassword)
+  Python and C++ implementations of a password strength checker.
+  Validates passwords against a weak password list, checks uppercase, lowercase, numbers, and symbols, calculates entropy, and provides strength feedback.
+
 ### 🎯 Goals
 - Keep improving in cybersecurity, automation, and math-heavy programming  
 - Gain real-world experience through freelance, tutoring, or internships  
