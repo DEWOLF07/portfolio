@@ -1,37 +1,33 @@
 🔐 Password Strength Checker (Python + C++)
-📌 Overview
+Overview
 
-This project contains two standalone implementations of a password strength checker:
+This repository contains two separate implementations of a password strength checker:
 
-Python → concise, beginner-friendly, easy to read.
+Python version – concise, beginner-friendly, and easy to modify.
 
-C++ → more verbose, performance-focused, closer to system-level programming.
+C++ version – more verbose, demonstrates low-level control and performance-oriented design.
 
 Both versions:
 
-Instantly reject passwords from a weak password list (dictionary attack defense).
+Load a small list of common weak passwords and instantly reject them.
 
 Check for uppercase, lowercase, numbers, and symbols.
 
 Calculate password entropy using:
 
-Shannon entropy (character distribution randomness)
+Shannon entropy (character distribution)
 
 Pool size entropy (based on possible character set size)
 
-Classify strength from Very Weak → Very Strong.
+Classify password strength from Very Weak → Very Strong.
 
-Give specific improvement advice.
+Provide advice for improving weak passwords.
 
-🆚 Python vs C++ in This Project
+Python vs. C++ in This Project
 Feature	Python Implementation	C++ Implementation
 Code length	Short, concise	Longer, more verbose
-Ease of writing	Very easy	More setup & type handling
+Ease of writing	Very easy	Requires more setup
 Readability	Beginner-friendly	Requires C++ knowledge
-Performance	Slower for huge datasets	Faster for large datasets
+Performance	Slower for massive checks	Faster for large datasets
 Data structure	dict / set	unordered_map / unordered_set
-Use case	Quick scripts, automation	Compiled security software
-
-📜 License
-
-This project uses the MIT License, meaning you’re free to use, modify, and share it — just give credit and don’t hold me liable.
+Use case	Quick scripts, automation	System-level tools, compiled security software
