@@ -1,0 +1,72 @@
+#nullable disable
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
+using System;
+using System.Collections.Generic;
+
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+// In-memory storage
+Dictionary<string, string> urlMap = new Dictionary<string, string>();
+
+// Generate short code
+string GenerateCode()
+{
+    string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    Random rand = new Random();
+    string code = "";
+
+    for (int i = 0; i < 6; i++)
+    {
+        int index = rand.Next(chars.Length);
+        code += chars[index];
+    }
+
+    return code;
+}
+
+// POST /shorten
+app.MapPost("/shorten", (HttpRequest request) =>
+{
+    string originalUrl = request.Query["url"];
+
+    if (string.IsNullOrEmpty(originalUrl))
+    {
+        return Results.BadRequest("URL is required");
+    }
+
+    Uri uriResult;
+    bool valid = Uri.TryCreate(originalUrl, UriKind.Absolute, out uriResult);
+
+    if (!valid)
+    {
+        return Results.BadRequest("Invalid URL");
+    }
+
+    string code = GenerateCode();
+
+    while (urlMap.ContainsKey(code))
+    {
+        code = GenerateCode();
+    }
+
+    urlMap[code] = originalUrl;
+
+    string shortUrl = $"http://localhost:5000/{code}";
+    return Results.Ok(shortUrl);
+});
+
+// GET /{code}
+app.MapGet("/{code}", (string code) =>
+{
+    if (!urlMap.ContainsKey(code))
+    {
+        return Results.NotFound("Not found");
+    }
+
+    return Results.Redirect(urlMap[code]);
+});
+
+app.Run();
