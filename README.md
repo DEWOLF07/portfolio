@@ -1,13 +1,13 @@
-# 👋 Hello
+#  Hello
 
 I'm a high school student who loves building things with code. I've been programming for over 3 years and enjoy solving logical problems and automating tasks.
 
-### 💻 Languages I Use
+###  Languages I Use
 - **C#** – Object-oriented coding, queues, linked lists, modding (Mostly Unity)
 - **Python** – Scripts, tools, simulations (Black-Scholes, Monte Carlo, cryptogram)
 - **C++** – Logic-heavy programming and math-based models
 
-### 🔧 Projects
+###  Projects
 
 - [1-priority-queue-csharp](./1priority-queue-csharp)  
   Custom priority queue using linked nodes in C# (no arrays or lists)
@@ -28,7 +28,7 @@ I'm a high school student who loves building things with code. I've been program
   Python and C++ implementations of a password strength checker.
   Validates passwords against a weak password list, checks uppercase, lowercase, numbers, and symbols, calculates entropy, and provides strength feedback.
 
-### 🎯 Goals
+###  Goals
 - Keep improving in cybersecurity, automation, and math-heavy programming  
 - Gain real-world experience through freelance, tutoring, or internships  
 - Build a strong portfolio and work with great teams
