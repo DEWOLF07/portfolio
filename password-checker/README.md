@@ -1,4 +1,4 @@
-🔐 Password Strength Checker (Python + C++)
+ Password Strength Checker (Python + C++)
 Overview
 
 This repository contains two separate implementations of a password strength checker:
