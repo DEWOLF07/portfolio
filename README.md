@@ -30,6 +30,6 @@ I'm a high school student who loves building things with code. I've been program
 
 ###  Goals
 - Keep improving in cybersecurity, automation, and math-heavy programming  
-- Gain real-world experience through freelance, tutoring, or internships  
+- Gain real-world experience 
 - Build a strong portfolio and work with great teams
 
