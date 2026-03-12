@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Mini Router Simulation — simulates how a real router forwards packets.
-Builds a routing table, runs longest-prefix-match on each destination IP,
+Builds a routing table, runs longest prefix match on each destination IP,
 decrements TTL, and traces packets across a two-router topology.
 
 Run: python3 router.py
@@ -69,11 +69,11 @@ class Router:
 
     def add_route(self, route: Route):
         self.table.append(route)
-        # Keep most-specific routes first so the first match is always the best
+        # Keep most specific routes first so the first match is always the best
         self.table.sort(key=lambda r: r.prefix, reverse=True)
 
     def best_route(self, dst: str) -> Optional[Route]:
-        # Longest prefix match — the core algorithm every router runs
+        # Longest prefix match : the core algorithm every router runs
         return next((r for r in self.table if in_network(dst, r.network, r.prefix)), None)
 
     def is_mine(self, ip: str) -> bool:
@@ -100,7 +100,7 @@ class Router:
 
 
 def build_network():
-    # Simulates: your home → ISP edge router → internet core → Google
+    # Simulates: your home  ISP edge router → internet core → Google
     isp = Router("ISP-Edge", "10.0.0.1")
     isp.add_interface(Interface("eth0", "192.168.1.1", "192.168.1.0", 24, "home network"))
     isp.add_interface(Interface("eth1", "10.0.0.1",   "10.0.0.0",   30, "core router"))
