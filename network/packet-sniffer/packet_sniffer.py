@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Packet Sniffer — watches raw TCP/UDP traffic on your machine in real time.
-Works like a stripped-down Wireshark. Opens a raw socket so the OS hands us
+Works like a stripped down Wireshark. Opens a raw socket so the OS hands us
 entire packets before filtering — IP header, TCP/UDP header, payload and all.
 
 Run: sudo python3 packet_sniffer.py [count]
@@ -23,7 +23,7 @@ PORTS = {
 
 
 def create_raw_socket():
-    # Raw sockets bypass OS filtering — requires root/admin
+    # Raw sockets bypass OS filtering : requires root/admin
     try:
         if os.name == "nt":
             sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_IP)
@@ -40,7 +40,7 @@ def create_raw_socket():
 
 def parse_ip_header(data):
     # IP header is always 20 bytes. Every router on earth reads this same structure.
-    # ! = network byte order (big-endian), B = 1 byte, H = 2 bytes, 4s = 4-byte string
+    # ! = network byte order (big endian), B = 1 byte, H = 2 bytes, 4s = 4-byte string
     ip = struct.unpack("!BBHHHBBH4s4s", data[:20])
     ihl = (ip[0] & 0xF) * 4
     return {
