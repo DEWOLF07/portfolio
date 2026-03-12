@@ -2,7 +2,7 @@
 """
 Network Scanner — discovers live hosts and open ports on a network.
 For each open port it grabs the service banner (version string the server
-announces on connect) and flags anything that looks risky.
+announces on connect) and flags anything that looks risky/sus.
 
 Run: python3 scanner.py <IP or CIDR>
      python3 scanner.py 192.168.1.0/24
@@ -43,7 +43,7 @@ PORTS = sorted(SERVICES.keys())
 
 
 def is_alive(ip: str, timeout=1.0) -> bool:
-    # Try a few common ports — if anything responds (even refused), host is up
+    # Try a few common ports : if anything responds (even refused), means host is up
     for port in [80, 443, 22, 8080]:
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -110,7 +110,7 @@ def scan_port(ip: str, port: int, timeout=1.0) -> dict:
 
 
 def scan_host(ip: str) -> list:
-    # Parallel port scan — sequential would take minutes, threads make it ~10s
+    # Parallel port scan : sequential would take minutes, threads make it about 10s
     with ThreadPoolExecutor(max_workers=100) as ex:
         futures = {ex.submit(scan_port, ip, p): p for p in PORTS}
         return sorted(
