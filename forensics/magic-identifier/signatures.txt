@@ -1,0 +1,79 @@
+# Magic Number Signature Database
+# Format: offset | hex_bytes | file_type | mime_type | category | description
+# offset    = byte position to start reading (integer)
+# hex_bytes = space-separated hex values e.g. 89 50 4E 47
+# Use # for comments and blank lines for readability
+
+# ── Images ────────────────────────────────────────────────────────────────────
+0 | 89 50 4E 47 0D 0A 1A 0A | PNG       | image/png                  | Image    | Portable Network Graphics
+0 | FF D8 FF                 | JPEG      | image/jpeg                 | Image    | JPEG Image
+0 | 47 49 46 38 37 61        | GIF       | image/gif                  | Image    | GIF 87a
+0 | 47 49 46 38 39 61        | GIF       | image/gif                  | Image    | GIF 89a
+0 | 42 4D                    | BMP       | image/bmp                  | Image    | Windows Bitmap
+0 | 00 00 01 00              | ICO       | image/x-icon               | Image    | Windows Icon
+0 | 49 49 2A 00              | TIFF      | image/tiff                 | Image    | TIFF little-endian
+0 | 4D 4D 00 2A              | TIFF      | image/tiff                 | Image    | TIFF big-endian
+0 | 00 00 00 0C 66 74 79 70  | HEIF      | image/heif                 | Image    | High Efficiency Image Format
+
+# ── Containers (disambiguated at runtime) ─────────────────────────────────────
+0 | 52 49 46 46              | RIFF      | application/octet-stream   | Container | RIFF container (WAV/WEBP/AVI)
+0 | 50 4B 03 04              | ZIP_BASED | application/zip            | Container | ZIP-based (ZIP/DOCX/EPUB/APK)
+4 | 66 74 79 70              | MP4_FTYP  | video/mp4                  | Container | MP4 family (MP4/MOV/M4A/3GP)
+
+# ── Documents ─────────────────────────────────────────────────────────────────
+0 | 25 50 44 46 2D           | PDF       | application/pdf            | Document  | Portable Document Format
+0 | D0 CF 11 E0 A1 B1 1A E1  | CFB       | application/msword         | Document  | Compound File Binary (DOC/XLS/PPT)
+0 | 7B 5C 72 74 66 31        | RTF       | application/rtf            | Document  | Rich Text Format
+
+# ── Executables ───────────────────────────────────────────────────────────────
+0 | 4D 5A                    | PE        | application/x-msdownload   | Executable | Windows PE (EXE/DLL)
+0 | 7F 45 4C 46              | ELF       | application/x-elf          | Executable | Linux/Unix ELF
+0 | FE ED FA CE              | MACHO32   | application/x-mach-binary  | Executable | macOS Mach-O 32-bit
+0 | FE ED FA CF              | MACHO64   | application/x-mach-binary  | Executable | macOS Mach-O 64-bit
+0 | CA FE BA BE              | MACHO_FAT | application/x-mach-binary  | Executable | macOS Universal Binary
+0 | 23 21                    | SHEBANG   | text/x-shellscript         | Script     | Unix script (shebang)
+
+# ── Archives ──────────────────────────────────────────────────────────────────
+0   | 1F 8B                        | GZIP  | application/gzip           | Archive | Gzip
+0   | 42 5A 68                     | BZIP2 | application/x-bzip2        | Archive | Bzip2
+0   | FD 37 7A 58 5A 00            | XZ    | application/x-xz           | Archive | XZ
+0   | 37 7A BC AF 27 1C            | 7ZIP  | application/x-7z-compressed| Archive | 7-Zip
+0   | 52 61 72 21 1A 07 00         | RAR4  | application/vnd.rar        | Archive | RAR v4
+0   | 52 61 72 21 1A 07 01 00      | RAR5  | application/vnd.rar        | Archive | RAR v5
+257 | 75 73 74 61 72 00            | TAR   | application/x-tar          | Archive | POSIX TAR
+257 | 75 73 74 61 72 20 20 00      | TAR   | application/x-tar          | Archive | GNU TAR
+
+# ── Audio ─────────────────────────────────────────────────────────────────────
+0 | 49 44 33                 | MP3   | audio/mpeg  | Audio | MP3 (ID3 tag)
+0 | FF FB                    | MP3   | audio/mpeg  | Audio | MP3 (frame sync)
+0 | FF F3                    | MP3   | audio/mpeg  | Audio | MP3 (frame sync alt)
+0 | 66 4C 61 43              | FLAC  | audio/flac  | Audio | FLAC
+0 | 4F 67 67 53              | OGG   | audio/ogg   | Audio | Ogg (Vorbis/Opus)
+0 | 4D 41 43 20              | APE   | audio/ape   | Audio | Monkey's Audio
+
+# ── Video ─────────────────────────────────────────────────────────────────────
+0 | 1A 45 DF A3              | MKV   | video/x-matroska | Video | Matroska (MKV/WEBM)
+0 | 00 00 01 BA              | MPEG  | video/mpeg       | Video | MPEG video stream
+0 | 00 00 01 B3              | MPEG  | video/mpeg       | Video | MPEG sequence header
+0 | 46 4C 56 01              | FLV   | video/x-flv      | Video | Flash Video
+
+# ── Database ──────────────────────────────────────────────────────────────────
+0 | 53 51 4C 69 74 65 20 66 6F 72 6D 61 74 20 33 00 | SQLITE | application/x-sqlite3 | Database | SQLite 3
+
+# ── Fonts ─────────────────────────────────────────────────────────────────────
+0 | 77 4F 46 46              | WOFF  | font/woff  | Font | Web Open Font Format 1.0
+0 | 77 4F 46 32              | WOFF2 | font/woff2 | Font | Web Open Font Format 2.0
+0 | 00 01 00 00 00           | TTF   | font/ttf   | Font | TrueType Font
+0 | 4F 54 54 4F              | OTF   | font/otf   | Font | OpenType Font
+
+# ── Bytecode ──────────────────────────────────────────────────────────────────
+0 | CA FE BA BE              | CLASS | application/java-vm           | Bytecode | Java Class
+0 | 64 65 78 0A              | DEX   | application/vnd.android.dex   | Bytecode | Android DEX
+
+# ── Crypto ────────────────────────────────────────────────────────────────────
+0 | 2D 2D 2D 2D 2D 42 45 47 49 4E 20 | PEM | application/x-pem-file | Crypto | PEM certificate/key
+
+# ── Text encodings ────────────────────────────────────────────────────────────
+0 | EF BB BF     | UTF8_BOM  | text/plain | Text | UTF-8 with BOM
+0 | FF FE        | UTF16_LE  | text/plain | Text | UTF-16 Little-Endian
+0 | FE FF        | UTF16_BE  | text/plain | Text | UTF-16 Big-Endian
