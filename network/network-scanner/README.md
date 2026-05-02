@@ -24,5 +24,5 @@ python3 scanner.py 192.168.1.1
 python3 scanner.py 192.168.1.0/24       # entire subnet
 ```
 
-Only scan networks you own or have permission to test.
+⚠️Only scan networks you own or have permission to test.
 
