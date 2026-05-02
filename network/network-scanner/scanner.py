@@ -1,198 +1,139 @@
-#!/usr/bin/env python3
-"""
-Network Scanner — discovers live hosts and open ports on a network.
-For each open port it grabs the service banner (version string the server
-announces on connect) and flags anything that looks risky/sus.
-
-Run: python3 scanner.py <IP or CIDR>
-     python3 scanner.py 192.168.1.0/24
-     python3 scanner.py 192.168.1.1
-
-Only scan networks you own or have explicit permission to test.
-"""
-
 import socket
-import threading
 import sys
 import time
-import ipaddress
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from collections import Counter
+import ipaddress
 
+# ports we care about and what they mean , risk is how bad it is if exposed
 SERVICES = {
     21:    ("FTP",        "HIGH",     "unencrypted file transfer"),
-    22:    ("SSH",        "LOW",      "secure shell — check version"),
-    23:    ("TELNET",     "CRITICAL", "unencrypted shell — never expose"),
-    25:    ("SMTP",       "MEDIUM",   "mail server"),
-    53:    ("DNS",        "MEDIUM",   "name resolution"),
+    22:    ("SSH",        "LOW",      "secure shell"),
+    23:    ("TELNET",     "CRITICAL", "unencrypted shell — never expose this"),
     80:    ("HTTP",       "MEDIUM",   "web server"),
-    110:   ("POP3",       "HIGH",     "unencrypted mail"),
-    143:   ("IMAP",       "HIGH",     "unencrypted mail"),
     443:   ("HTTPS",      "LOW",      "encrypted web"),
-    445:   ("SMB",        "CRITICAL", "windows file sharing — EternalBlue target"),
-    3306:  ("MySQL",      "CRITICAL", "database — should never be internet-facing"),
+    445:   ("SMB",        "CRITICAL", "windows file sharing — often exploited"),
+    3306:  ("MySQL",      "CRITICAL", "database — should never be public"),
     3389:  ("RDP",        "HIGH",     "remote desktop"),
-    5432:  ("PostgreSQL", "CRITICAL", "database — should never be internet-facing"),
-    6379:  ("Redis",      "CRITICAL", "often no auth by default"),
+    6379:  ("Redis",      "CRITICAL", "often has no password by default"),
     8080:  ("HTTP-ALT",   "MEDIUM",   "secondary web port"),
-    8443:  ("HTTPS-ALT",  "LOW",      "secondary https"),
-    27017: ("MongoDB",    "CRITICAL", "often no auth by default"),
+    27017: ("MongoDB",    "CRITICAL", "often has no password by default"),
 }
 
 PORTS = sorted(SERVICES.keys())
 
 
-def is_alive(ip: str, timeout=1.0) -> bool:
-    # Try a few common ports : if anything responds (even refused), means host is up
-    for port in [80, 443, 22, 8080]:
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(timeout)
-            if s.connect_ex((ip, port)) in (0, 111):
-                s.close()
-                return True
-            s.close()
-        except OSError:
-            continue
-    return False
-
-
-def discover(cidr: str) -> list:
-    try:
-        hosts = list(ipaddress.ip_network(cidr, strict=False).hosts())[:256]
-    except ValueError as e:
-        print(f"Invalid network: {e}")
-        return []
-
-    print(f"\n[*] Sweeping {cidr} ({len(hosts)} addresses)...\n")
-    live, lock = [], threading.Lock()
-
-    def check(ip):
-        if is_alive(str(ip)):
-            with lock:
-                live.append(str(ip))
-                print(f"  [+] {ip}")
-
-    with ThreadPoolExecutor(max_workers=50) as ex:
-        ex.map(check, hosts)
-
-    return sorted(live, key=lambda x: ipaddress.ip_address(x))
-
-
-def scan_port(ip: str, port: int, timeout=1.0) -> dict:
-    name, risk, _ = SERVICES.get(port, ("?", "UNKNOWN", ""))
-    result = {"port": port, "state": "closed", "service": name, "risk": risk, "banner": None}
-
+# try connecting to a port , returns True if open, False if not
+def is_port_open(ip, port, timeout=1.0):
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(timeout)
-        conn = s.connect_ex((ip, port))
-
-        if conn == 0:
-            result["state"] = "open"
-            try:
-                s.settimeout(2.0)
-                if port in (80, 8080, 443, 8443):
-                    s.send(f"HEAD / HTTP/1.0\r\nHost: {ip}\r\n\r\n".encode())
-                banner = s.recv(1024).decode("utf-8", errors="ignore").strip()
-                if banner:
-                    result["banner"] = banner.split("\n")[0][:100]
-            except (socket.timeout, OSError):
-                pass
-        elif conn != 111:
-            result["state"] = "filtered"
-
+        open = s.connect_ex((ip, port)) == 0
         s.close()
+        return open
+    except OSError:
+        return False
+
+
+# once connected, try to read whatever the server says first (its "banner")
+# this often reveals the software name and version
+def grab_banner(s, ip, port):
+    try:
+        s.settimeout(2.0)
+        if port in (80, 8080):  # HTTP needs a request first before it responds
+            s.send(f"HEAD / HTTP/1.0\r\nHost: {ip}\r\n\r\n".encode())
+        banner = s.recv(1024).decode("utf-8", errors="ignore").strip()
+        return banner.split("\n")[0][:80] if banner else None
     except (socket.timeout, OSError):
-        result["state"] = "filtered"
+        return None
+
+
+# scan one port and return what was found
+def scan_port(ip, port):
+    name, risk, _ = SERVICES.get(port, ("?", "UNKNOWN", ""))
+    result = {"port": port, "open": False, "service": name, "risk": risk, "banner": None}
+
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(1.0)
+        if s.connect_ex((ip, port)) == 0:
+            result["open"] = True
+            result["banner"] = grab_banner(s, ip, port)
+        s.close()
+    except OSError:
+        pass
 
     return result
 
 
-def scan_host(ip: str) -> list:
-    # Parallel port scan : sequential would take minutes, threads make it about 10s
-    with ThreadPoolExecutor(max_workers=100) as ex:
-        futures = {ex.submit(scan_port, ip, p): p for p in PORTS}
-        return sorted(
-            (f.result() for f in as_completed(futures) if f.result()["state"] == "open"),
-            key=lambda x: x["port"]
-        )
+# scan all ports on a host in parallel — sequential(one by one) would take way too long
+def scan_host(ip):
+    print(f"\n[*] Scanning {ip}...")
+
+    with ThreadPoolExecutor(max_workers=50) as executor:
+        futures = {executor.submit(scan_port, ip, p): p for p in PORTS}
+        open_ports = [
+            f.result() for f in as_completed(futures)
+            if f.result()["open"]
+        ]
+
+    return sorted(open_ports, key=lambda x: x["port"])
 
 
-def risk_score(ports: list) -> dict:
+# add up the risk of all open ports and return a summary
+def calculate_risk(open_ports):
     weights = {"CRITICAL": 10, "HIGH": 5, "MEDIUM": 2, "LOW": 1, "UNKNOWN": 1}
-    total   = sum(weights.get(p["risk"], 1) for p in ports)
-    level   = "CRITICAL" if total >= 20 else "HIGH" if total >= 10 else "MEDIUM" if total >= 5 else "LOW"
-    flagged = [f"{p['port']} ({p['service']}) [{p['risk']}]"
-               for p in ports if p["risk"] in ("CRITICAL", "HIGH")]
-    return {"level": level, "score": total, "flagged": flagged}
+    score = sum(weights.get(p["risk"], 1) for p in open_ports)
+
+    if score >= 20:   level = "CRITICAL"
+    elif score >= 10: level = "HIGH"
+    elif score >= 5:  level = "MEDIUM"
+    else:             level = "LOW"
+
+    return level, score
 
 
-def guess_os(ports: list) -> str:
-    nums    = {p["port"] for p in ports}
-    banners = " ".join(p.get("banner") or "" for p in ports).lower()
-    if 3389 in nums and 445 in nums: return "likely Windows Server"
-    if 3389 in nums:                 return "likely Windows"
-    if "ubuntu" in banners:          return "Ubuntu Linux"
-    if "nginx"  in banners:          return "Linux + Nginx"
-    if "apache" in banners:          return "Linux + Apache"
-    if 22 in nums:                   return "Unix-like"
-    return "unknown"
-
-
-def print_results(ip: str, ports: list):
-    risk = risk_score(ports)
+# print everything that was found in a readable way
+def print_results(ip, open_ports):
+    risk_level, score = calculate_risk(open_ports)
     icons = {"CRITICAL": "[!!]", "HIGH": "[!]", "MEDIUM": "[~]", "LOW": "[ok]"}
 
-    print(f"\n{'=' * 58}")
-    print(f"  {ip}  —  {guess_os(ports)}")
-    print(f"  Risk: {icons.get(risk['level'],'?')} {risk['level']}  open ports: {len(ports)}")
+    print(f"\n{'=' * 50}")
+    print(f"  {ip}")
+    print(f"  Risk: {icons[risk_level]} {risk_level}  (score: {score})  open ports: {len(open_ports)}")
 
-    if ports:
-        print(f"\n  {'PORT':<8} {'SERVICE':<14} {'RISK':<10} BANNER")
-        print(f"  {'─' * 52}")
-        for p in ports:
-            print(f"  {p['port']:<8} {p['service']:<14} {p['risk']:<10} {(p['banner'] or '')[:28]}")
+    if not open_ports:
+        print("  No open ports found.")
+        return
 
-    if risk["flagged"]:
-        print(f"\n  Findings:")
-        for f in risk["flagged"]:
-            _, _, note = SERVICES.get(int(f.split()[0]), ("", "", ""))
-            print(f"    - {f}  —  {note}")
+    print(f"\n  {'PORT':<8} {'SERVICE':<14} {'RISK':<10} BANNER")
+    print(f"  {'-' * 46}")
+
+    for p in open_ports:
+        banner = (p["banner"] or "")[:28]
+        print(f"  {p['port']:<8} {p['service']:<14} {p['risk']:<10} {banner}")
+
+    # call out the dangerous ones specifically
+    flagged = [p for p in open_ports if p["risk"] in ("CRITICAL", "HIGH")]
+    if flagged:
+        print(f"\n  Warnings:")
+        for p in flagged:
+            _, _, note = SERVICES.get(p["port"], ("", "", "no info"))
+            print(f"    - port {p['port']} ({p['service']}): {note}")
 
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python3 scanner.py <IP or CIDR>")
+        print("Usage: python3 scanner.py <IP>")
         print("       python3 scanner.py 192.168.1.1")
-        print("       python3 scanner.py 192.168.1.0/24")
         return
 
-    target = sys.argv[1]
+    ip = sys.argv[1]
+    start = time.time()
 
-    if "/" in target:
-        live = discover(target)
-        if not live:
-            print("No hosts found.")
-            return
-        print(f"\n[*] {len(live)} hosts up. Scanning ports...\n")
-        results = []
-        for ip in live:
-            ports = scan_host(ip)
-            print_results(ip, ports)
-            results.append(ports)
+    ports = scan_host(ip)
+    print_results(ip, ports)
 
-        all_ports = [p for r in results for p in r]
-        freq = Counter(p["port"] for p in all_ports)
-        print(f"\nSummary — {len(results)} hosts, {len(all_ports)} open ports")
-        for port, count in freq.most_common(5):
-            print(f"  {port} ({SERVICES.get(port, ('?',))[0]}): {count} host(s)")
-    else:
-        print(f"\n[*] Scanning {target}...")
-        start = time.time()
-        ports = scan_host(target)
-        print_results(target, ports)
-        print(f"\n  {len(PORTS)} ports checked in {time.time() - start:.1f}s")
+    print(f"\n  {len(PORTS)} ports checked in {time.time() - start:.1f}s")
 
 
 if __name__ == "__main__":
