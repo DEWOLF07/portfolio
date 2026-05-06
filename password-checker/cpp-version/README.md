@@ -1,8 +1,7 @@
 
----
 # Password Strength Checker (C++)
 
-## 📌 Overview
+## Overview
 This is the **C++ implementation** of the password strength checker.
 
 ### Features
