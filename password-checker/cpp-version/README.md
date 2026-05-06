@@ -1,8 +1,5 @@
 
 ---
-
-**`cpp-version/README.md`**
-```markdown
 # Password Strength Checker (C++)
 
 ## 📌 Overview
