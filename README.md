@@ -4,7 +4,7 @@ I'm a high school student who loves building things with code. I've been program
 
 ###  Languages I Use
 - **C#** – Object-oriented coding, queues, linked lists, modding (Mostly Unity)
-- **Python** – Scripts, tools, simulations (Black-Scholes, Monte Carlo, cryptogram)
+- **Python** – Scripts, tools, simulations (Black-Scholes, Monte Carlo)
 - **C++** – Logic-heavy programming and math-based models
 
 ###  Projects
