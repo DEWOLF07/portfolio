@@ -17,7 +17,7 @@ This is the **C++ implementation** of the password strength checker.
 - Gives a **score** and a strength label.
 - Provides **advice** for improvement.
 
-### Why C++?
+### chose c++ because:
 - Shows **low-level control** and performance-oriented coding.
 - Demonstrates use of **`unordered_map`** and **`unordered_set`** for O(1) lookups.
 - Suitable for integrating into **compiled applications** or security tools.
