@@ -14,7 +14,6 @@ Before you can secure a network you need to know what's on it — and what it lo
 
 **Risk scoring** assigns a weight to each service based on what it is and how commonly it's exploited. An exposed Redis instance with no authentication is critical. Telnet is critical — it sends everything including passwords in plaintext. The scores combine into an overall host risk level.
 
-An open port is an attack surface. The fewer services visible from outside, the smaller the target.
 
 ## Run
 
@@ -24,5 +23,5 @@ python3 scanner.py 192.168.1.1
 python3 scanner.py 192.168.1.0/24       # entire subnet
 ```
 
-⚠️Only scan networks you own or have permission to test.
 
+For educational purposes only!!!
