@@ -3,7 +3,7 @@ import struct
 import sys
 import os
 
-# protocols i know about — number comes from the IP header
+# protocols — number comes from the IP header
 PROTOCOLS = {1: "ICMP", 6: "TCP", 17: "UDP"}
 
 # well known ports so i can show a name instead of just a number
