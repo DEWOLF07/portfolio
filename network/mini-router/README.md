@@ -8,7 +8,7 @@ A router is fundamentally just a table lookup. Every packet that arrives gets it
 
 The simulation builds two routers: an ISP edge and an internet core. Routes are added statically and via simulated BGP, which is the protocol real ISPs use to exchange routing information globally. Without BGP, no router would know how to reach networks it isn't directly connected to.
 
-Subnetting is what makes it all work. An address like `192.168.1.0/24` means the first 24 bits identify the network and the last 8 identify individual hosts. The router ANDs the destination IP against the subnet mask and checks for a match — pure bitwise math, done millions of times per second in hardware on real devices.
+Subnetting is what holds it together. An address like `192.168.1.0/24` means the first 24 bits identify the network and the last 8 identify individual hosts. The router ANDs the destination IP against the subnet mask and checks for a match. 
 
 TTL is the safety valve. Every packet starts with a counter (64 on Linux, 128 on Windows) that drops by 1 at each hop. When it hits zero the router discards the packet and sends an ICMP Time Exceeded message back to the sender. Traceroute exploits this deliberately — it sends packets with TTL=1, then TTL=2, then TTL=3, and collects the Time Exceeded replies to map every hop along the path.
 
