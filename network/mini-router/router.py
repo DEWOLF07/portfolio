@@ -18,21 +18,21 @@ def forward(router_name, packet):
     # every hop costs one TTL, hits zero means it's been traveling too long
     packet["ttl"] -= 1
     if packet["ttl"] <= 0:
-        print("  ✗ TTL hit zero — packet dropped!")
+        print("  TTL hit zero — packet dropped!")
         return None
 
     # look up the destination in our routing table
     next_hop = routing_table.get(packet["dst"])
 
     if next_hop is None:
-        print(f"  ✗ No route to {packet['dst']} — dropped!")
+        print(f"  No route to {packet['dst']} — dropped!")
         return None
 
     if next_hop == "local":
-        print(f"  ✓ It's local — delivering: '{packet['message']}'")
+        print(f"  It's local — delivering: '{packet['message']}'")
         return None
 
-    print(f"  → sending to {next_hop}  (TTL left: {packet['ttl']})")
+    print(f"  sending to {next_hop}  (TTL left: {packet['ttl']})")
     return next_hop
 
 
