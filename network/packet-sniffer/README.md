@@ -1,6 +1,6 @@
 # Packet Sniffer
 
-Captures live TCP/UDP traffic and reads it at the byte level — IP headers, flags, ports, payloads. No Wireshark, no libraries, just Python's raw socket API.
+Captures live TCP/UDP traffic and reads it at the byte level — IP headers, flags, ports, payloads.just Python's raw socket API.
 
 ## How it works
 
