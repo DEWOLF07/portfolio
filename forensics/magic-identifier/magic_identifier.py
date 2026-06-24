@@ -26,7 +26,6 @@ class Signature:
     category:    str
     description: str
 
-
 def load_signatures(path: str) -> list[Signature]:
     sigs = []
     with open(path) as f:
@@ -41,7 +40,6 @@ def load_signatures(path: str) -> list[Signature]:
             magic = bytes(int(b, 16) for b in hex_str.split())
             sigs.append(Signature(int(offset), magic, ft, mime, cat, desc))
     return sigs
-
 
 def disambiguate(file_type: str, data: bytes) -> Optional[tuple]:
     # Some containers need a second read to know exactly what they hold
@@ -81,7 +79,6 @@ def disambiguate(file_type: str, data: bytes) -> Optional[tuple]:
         return ("CFB", "application/msword", "Compound File Binary")
 
     return None
-
 
 def identify(path: str, signatures: list[Signature]) -> dict:
     p = Path(path)
@@ -144,7 +141,6 @@ def identify(path: str, signatures: list[Signature]) -> dict:
 
     return result
 
-
 def fmt_size(n: int) -> str:
     for unit in ["B", "KB", "MB", "GB"]:
         if n < 1024:
@@ -154,7 +150,7 @@ def fmt_size(n: int) -> str:
 
 
 def print_result(r: dict):
-    mismatch = "  ⚠  EXTENSION MISMATCH" if r.get("extension_match") is False else ""
+    mismatch = "EXTENSION MISMATCH" if r.get("extension_match") is False else ""
     print(f"\n  {r['path']}")
     if r.get("error"):
         print(f"  error: {r['error']}")
@@ -182,7 +178,6 @@ def create_demo_files(tmp="/tmp/magic_demo") -> list:
         p.write_bytes(content)
         paths.append(str(p))
     return paths
-
 
 def main():
     sig_path = Path(__file__).parent / "signatures.txt"
@@ -218,7 +213,7 @@ def main():
         for cat, n in sorted(freq.items()):
             print(f"    {cat}: {n}")
         if mismatches:
-            print(f"\n  ⚠  {len(mismatches)} extension mismatch(es):")
+            print(f"\n  {len(mismatches)} extension mismatch(es):")
             for r in mismatches:
                 print(f"     {r['path']}  →  {r['file_type']}")
         return
