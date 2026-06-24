@@ -18,8 +18,6 @@ TTL is the safety valve. Every packet starts with a counter (64 on Linux, 128 on
 python3 router.py
 ```
 
-No root needed — pure simulation.
-
 ## Scenarios
 
 - **DNS lookup** — UDP packet from home to `8.8.8.8:53`, traced through both routers
